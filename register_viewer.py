@@ -87,6 +87,7 @@ class ViewRegister(gdb.Command):
         if reg_address is None:
             print("Invalid register name")
             return
+        print(f"Address: 0x{reg_address:08X}")
 
         try:
             # Read 4 bytes from register address
