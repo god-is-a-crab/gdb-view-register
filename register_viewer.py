@@ -49,6 +49,7 @@ class Device:
                         fields.append(BitField(f.name, f.bit_offset, f.bit_width, enum_values))
                     else:
                         fields.append(BitField(f.name, f.bit_offset, f.bit_width, None))
+                fields.sort(key=lambda f: f.bit_offset, reverse=True)
                 registers[r.name] = register
 
             self.peripherals[p.name] = peripheral
