@@ -1,7 +1,7 @@
 """
 ISC License
 
-Copyright (c) 2024, JN binotation
+Copyright (c) 2025, JN binotation
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -86,23 +86,38 @@ class Device:
                 for f in register.fields:
                     Device.display_register_field(f, value)
 
+device = None
+
+class LoadSvd(gdb.Command):
+    """GDB plugin: load device SVD"""
+    def __init__(self):
+        super(LoadSvd, self).__init__("loadsvd", gdb.COMMAND_DATA)
+
+    def invoke(self, args, from_tty):
+        args = gdb.string_to_argv(args)
+        if len(args) < 1:
+            print("Usage: loadsvd <SVD_FILEPATH>")
+            return
+        global device
+        device = Device(args[0])
+
 class ViewRegister(gdb.Command):
     """GDB plugin: view register fields."""
 
     def __init__(self):
         super(ViewRegister, self).__init__("view", gdb.COMMAND_DATA)
-        cwd_files = os.listdir(".")
-        svd_file = next((file for file in cwd_files if file.rfind(".svd") != -1), None)
-        self.device = Device(svd_file)
 
     def invoke(self, args, from_tty):
+        if device is None:
+            print("Error: no device SVD loaded")
+            return
         args = gdb.string_to_argv(args)
         if len(args) < 1:
             print("Usage: view <REGISTER_NAME> e.g. `view GPDMA1.GPDMA_C1TR1`")
             return
 
         register_name = args[0]
-        reg_address = self.device.get_register_address(register_name)
+        reg_address = device.get_register_address(register_name)
         if reg_address is None:
             print("Invalid register name")
             return
@@ -116,6 +131,7 @@ class ViewRegister(gdb.Command):
             print(f"Error: {str(e)}")
             return
 
-        self.device.view_register(register_name, reg_value)
+        device.view_register(register_name, reg_value)
 
+LoadSvd()
 ViewRegister()

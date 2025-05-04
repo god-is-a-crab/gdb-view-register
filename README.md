@@ -4,6 +4,7 @@ This is a GDB plugin that prints register fields based on a device SVD file. Cop
 
 ```
 (gdb) source register_viewer.py 
+(gdb) loadsvd STM32L412.svd
 (gdb) view GPDMA1.GPDMA_C1TR1
 SDW_LOG2   (bit 0 ): 0    (byte)
 SINC       (bit 3 ): 0    (fixed burst)
