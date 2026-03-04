@@ -33,19 +33,21 @@ class Device:
 
         device = SVDParser.for_xml_file(svdpath).get_device()
         self.peripherals = dict()
-        for p in device.peripherals:
+        for p in device.get_peripherals():
             registers = dict()
             peripheral = Peripheral(p.base_address, registers)
 
-            for r in p.registers:
+            for r in p.get_registers():
                 fields = []
                 register = Register(r.address_offset, fields)
 
-                for f in r.fields:
+                for f in r.get_fields():
                     if f.enumerated_values is not None:
                         enum_values = dict()
                         for e in f.enumerated_values:
-                            enum_values[e.value] = e.description.strip()
+                            value = e.enumerated_values[0].value
+                            description = e.enumerated_values[0].description
+                            enum_values[value] = description.strip()
                         fields.append(BitField(f.name, f.bit_offset, f.bit_width, enum_values))
                     else:
                         fields.append(BitField(f.name, f.bit_offset, f.bit_width, None))
